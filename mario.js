@@ -56,17 +56,82 @@ var count = 0;
 var count2 = 0
 var range = 200;
 var spotted = true;
+var rightWall = 1190;
+var leftWall = -5;
+var distance = -500;
+var entRight = false;
+var entLeft = false;
+var right = false;
+var stop = 0;
+var stop2 = 0;
 Mario.prototype.update = function () {
-    if(this.game.moveLeft) {
-        this.movingLeft = true;
-    } else {
-        this.movingLeft = false;
-    }
-    if(this.game.moveRight) {
+    // if(this.game.moveLeft) {
+    //     this.movingLeft = true;
+    // } else {
+    //     this.movingLeft = false;
+    // }
+    // if(this.game.moveRight) {
+    //     this.movingRight = true;
+    // }else{
+    //     this.movingRight = false;
+    // }
+    
+    
+    if(this.x != rightWall && !right) {
+        count++;
         this.movingRight = true;
-    }else{
-        this.movingRight = false;
+        console.log("STOP" + stop)
+        if(count % 20 == 0) {
+            stop ++
+        }
+        if(stop > 5 && entRight) {
+           // console.log("I stopped!")
+            
+            this.movingRight = false;
+            this.currentAnimation = this.idleAnimation;
+            this.facing = "L"
+        }if(stop > 12) {
+            this.facing = "R";
+            this.movingRight = true;
+            stop = 0
+        }
+        
     }
+    else{
+        this.movingRight = false;
+        //this.facing = "L"
+        right = true;
+        count = 0
+
+    }
+    if(this.x >=-5 && right) {
+        count2 ++;
+        this.movingLeft = true;
+        if(count2 % 20 == 0) {
+            stop2++;
+        }
+        if(stop2 > 5 && entLeft) {
+
+            this.facing = "R"
+            this.movingLeft = false;
+        }if(stop2 > 12) {
+            this.facing ="L";
+            this.movingLeft = true;
+            stop2 = 0
+        }
+
+    }else {
+        right = false;
+        this.movingLeft = false;
+        //this.facing = "R"
+        count2 = 0;
+    }
+    
+
+
+       
+        //count = 0;
+    
     if (this.movingRight) {
         //IF THIS IS NOT GETTING ATTACKED THE DO IT
             this.currentAnimation = this.Ranimation;
@@ -102,6 +167,7 @@ Mario.prototype.update = function () {
         }
         
     }
+   //console.log("DIstance" + count)
     
     
     count ++;
@@ -110,8 +176,8 @@ Mario.prototype.update = function () {
         
         var ent = this.game.entities[i];
         if(ent.name == "Boo") {
-            console.log("Mario facing: " + this.facing);
-            console.log("Boo facing: " + ent.facing);
+          //  console.log("Mario facing: " + this.facing);
+          //  console.log("Boo facing: " + ent.facing);
             
             
                  
@@ -125,13 +191,16 @@ Mario.prototype.update = function () {
                 ent.disappearAnimation.elapsedTime = 0;
             }
             if(this.x < ent.x && (Math.abs(this.x - ent.x) > range)) {
+                                        entLeft = true;
+                                        entRight = false;
                 						ent.facing = "L";
                 						ent.currentAnimation = ent.animation;
                 						
                 						ent.x -= ent.speed;
                 					}
                 else if(this.x > ent.x && (Math.abs(this.x - ent.x) > range-10)) {
-                        
+                                        entLeft = false;
+                                        entRight = true;
                 						ent.facing = "R";
                 						ent.currentAnimation = ent.Ranimation
                 						
@@ -141,8 +210,18 @@ Mario.prototype.update = function () {
         
         
          else {
+             if(Math.abs(this.x - ent.x) < 100) {
+                //console.log("THird")
+                 if(this.facing == "R") {
+                     this.movingRight = false;
+                     this.facing ="L"
+                 } else {
+                     this.movingLeft = false;
+                     this.facing = "R"
+                 }
+             }
             if(ent.facing == "R" && this.facing == "L") {
-                console.log("HEY")
+                
                 ent.currentAnimation = ent.appearLeftAnimation;
             } else if(ent.facing == "L" && this.facing == "R"){
                 ent.currentAnimation = ent.disappearLeftAnimation;
@@ -150,14 +229,22 @@ Mario.prototype.update = function () {
              else {
                  if(ent.facing == "R") {
                     ent.currentAnimation = ent.idleLeftAnimation;
+                    
                 }else {
                     ent.currentAnimation = ent.idleAnimation;
                 }
                 if(ent.appearLeftAnimation.isDone()) {
                     ent.appearLeftAnimation.elapsedTime = 0;
+                    spotted = true;
+                    count = 0;
+                    count2 = 0
+                    
                 }
                 if(ent.disappearLeftAnimation.isDone()) {
                     ent.disappearLeftAnimation.elapsedTime = 0;
+                    spotted = true;
+                    count = 0;
+                    count2 = 0;
                 }
         }
     }
